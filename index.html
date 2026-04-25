@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>✨ Менеджер красивых ссылок | Добавляй и переходи</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fe 0%, #eef2f9 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        /* основной контейнер */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 5px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* заголовок */
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #1e2b6e, #2a3f8f, #3b5ba5);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.01em;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1::before {
+            content: "🔗";
+            font-size: 2rem;
+            background: none;
+            -webkit-background-clip: unset;
+            color: #2c3e8f;
+        }
+
+        .sub {
+            color: #4a5568;
+            margin-top: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            border-left: 4px solid #4f46e5;
+            padding-left: 1rem;
+            background: rgba(79, 70, 229, 0.08);
+            border-radius: 0 1rem 1rem 0;
+            width: fit-content;
+        }
+
+        /* форма добавления */
+        .form-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s;
+            border: 1px solid rgba(79, 70, 229, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1.2rem;
+            transition: all 0.2s ease;
+            background: #fefefe;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            background: white;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(105deg, #4f46e5, #6366f1);
+            color: white;
+            padding: 0.9rem 1.8rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.25);
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(79, 70, 229, 0.3);
+            background: linear-gradient(105deg, #4338ca, #4f46e5);
+        }
+
+        /* сетка карточек */
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 1.8rem;
+            margin-top: 1rem;
+        }
+
+        /* карточка ссылки */
+        .link-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.4rem 1.2rem 1.2rem 1.2rem;
+            transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            backdrop-filter: blur(2px);
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.15);
+            border-color: rgba(79, 70, 229, 0.3);
+            background: #ffffff;
+        }
+
+        .link-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.65rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            word-break: break-word;
+        }
+
+        .link-title span {
+            background: #eef2ff;
+            font-size: 1.2rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .link-url {
+            font-size: 0.8rem;
+            color: #4b5563;
+            background: #f8fafc;
+            padding: 0.4rem 0.7rem;
+            border-radius: 1rem;
+            margin: 0.8rem 0 1rem 0;
+            word-break: break-all;
+            font-family: monospace;
+            border: 1px solid #eef2ff;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            transition: 0.1s;
+        }
+
+        .link-url:hover {
+            white-space: normal;
+            background: #ffffff;
+            border-color: #cbd5e1;
+        }
+
+        /* кнопки действий */
+        .card-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: auto;
+            flex-wrap: wrap;
+        }
+
+        .btn-go {
+            background: #4f46e5;
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+
+        .btn-go:hover {
+            background: #2e3b9e;
+            transform: scale(0.97);
+            gap: 10px;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 0.6rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            flex: 0.5;
+            justify-content: center;
+        }
+
+        .btn-delete:hover {
+            background: #fecaca;
+            color: #991b1b;
+            transform: scale(0.96);
+        }
+
+        /* пустое состояние */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(255,255,240,0.6);
+            border-radius: 2rem;
+            color: #475569;
+            font-size: 1.1rem;
+            backdrop-filter: blur(2px);
+        }
+
+        .empty-state p {
+            margin: 0.5rem 0;
+        }
+
+        .empty-state::before {
+            content: "✨";
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* уведомление */
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #1f2937;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            z-index: 999;
+            backdrop-filter: blur(12px);
+            background: rgba(0,0,0,0.8);
+            font-weight: 500;
+        }
+
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6c757d;
+            border-top: 1px solid rgba(79,70,229,0.2);
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 560px) {
+            .container {
+                padding: 1.2rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .card-actions {
+                flex-direction: column;
+            }
+            .btn-go, .btn-delete {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Красивые ссылки</h1>
+    <div class="sub">Добавьте любые URL — каждая ссылка станет стильной карточкой с быстрым переходом</div>
+
+    <!-- форма добавления -->
+    <div class="form-card">
+        <form id="linkForm">
+            <div class="form-group">
+                <label>📌 Название ссылки</label>
+                <input type="text" id="titleInput" placeholder="Например: Мой любимый блог" autocomplete="off" required>
+            </div>
+            <div class="form-group">
+                <label>🔗 Адрес (URL)</label>
+                <input type="text" id="urlInput" placeholder="https://example.com или example.com" autocomplete="off" required>
+            </div>
+            <button type="submit" class="btn-primary">➕ Добавить красивую ссылку</button>
+        </form>
+    </div>
+
+    <!-- сетка со ссылками -->
+    <div id="linksContainer" class="links-grid">
+        <!-- сюда динамически рендерятся карточки -->
+    </div>
+    <footer>
+        💡 Нажмите «Перейти» — откроется в новой вкладке. Ссылки сохраняются в памяти браузера 🧠
+    </footer>
+</div>
+<div id="toastMsg" class="toast-msg"></div>
+
+<script>
+    (function() {
+        // ------------------- данные и хранилище -------------------
+        let links = [];  // каждый объект: { id, title, url }
+
+        // ключ для localStorage
+        const STORAGE_KEY = 'beautiful_links_collection';
+
+        // DOM элементы
+        const linksContainer = document.getElementById('linksContainer');
+        const titleInput = document.getElementById('titleInput');
+        const urlInput = document.getElementById('urlInput');
+        const linkForm = document.getElementById('linkForm');
+        const toastEl = document.getElementById('toastMsg');
+
+        // вспомогательная функция показа уведомлений
+        function showMessage(text, isError = false) {
+            toastEl.textContent = text;
+            toastEl.classList.add('show');
+            if (isError) {
+                toastEl.style.background = '#b91c1cd9';
+                toastEl.style.backdropFilter = 'blur(8px)';
+            } else {
+                toastEl.style.background = '#1f2937e6';
+            }
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+                if (isError) setTimeout(() => { toastEl.style.background = '#1f2937e6'; }, 300);
+            }, 2200);
+        }
+
+        // нормализация URL: если протокол отсутствует, добавляем https://, затем проверяем валидность
+        function normalizeAndValidateUrl(rawUrl) {
+            if (!rawUrl || rawUrl.trim() === '') return null;
+            let urlStr = rawUrl.trim();
+            // если не начинается с http:// или https://
+            if (!/^https?:\/\//i.test(urlStr)) {
+                urlStr = 'https://' + urlStr;
+            }
+            try {
+                const testUrl = new URL(urlStr);
+                // дополнительная фильтрация: разрешаем http / https
+                if (testUrl.protocol !== 'http:' && testUrl.protocol !== 'https:') {
+                    return null;
+                }
+                return testUrl.href;
+            } catch (err) {
+                return null;
+            }
+        }
+
+        // сохранение в localStorage
+        function saveLinksToLocal() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+        }
+
+        // загрузка из localStorage, если пусто - создаём демо-ссылки
+        function loadLinksFromLocal() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed)) {
+                        links = parsed;
+                        return;
+                    }
+                } catch(e) { /* fallback */ }
+            }
+            // дефолтные красивые примеры ссылок (показываем возможности)
+            links = [
+                { id: Date.now() + 101, title: '✨ Google — главный поиск', url: 'https://www.google.com' },
+                { id: Date.now() + 102, title: '💻 GitHub — мир кода', url: 'https://github.com' },
+                { id: Date.now() + 103, title: '🎬 YouTube — видео и вдохновение', url: 'https://youtube.com' },
+                { id: Date.now() + 104, title: '📘 Wikipedia — знания', url: 'https://wikipedia.org' },
+                { id: Date.now() + 105, title: '🎨 Figma — дизайн-платформа', url: 'https://figma.com' }
+            ];
+            saveLinksToLocal();
+        }
+
+        // рендеринг всех карточек в сетку
+        function renderLinks() {
+            if (!linksContainer) return;
+
+            if (links.length === 0) {
+                linksContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>🌟 Здесь пока нет ссылок</p>
+                        <p style="font-size: 0.9rem;">Добавьте свою первую ссылку через форму выше ✨</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // генерируем карточки для каждой ссылки
+            let cardsHtml = '';
+            for (let i = 0; i < links.length; i++) {
+                const link = links[i];
+                // безопасное отображение url (обрезаем визуально)
+                let displayUrl = link.url.length > 55 ? link.url.substring(0, 52) + '...' : link.url;
+                // символ для иконки по первой букве или эмоджи
+                const firstChar = link.title.charAt(0).toUpperCase();
+                const iconEmoji = /[\u{1F300}-\u{1F6FF}]/u.test(link.title) ? link.title.charAt(0) : (link.title.match(/[\p{Emoji}]/u) ? link.title.charAt(0) : '🔗');
+                
+                cardsHtml += `
+                    <div class="link-card" data-id="${link.id}">
+                        <div class="link-title">
+                            <span>${iconEmoji !== '🔗' ? iconEmoji : firstChar}</span>
+                            ${escapeHtml(link.title)}
+                        </div>
+                        <div class="link-url" title="${escapeHtml(link.url)}">
+                            🔗 ${escapeHtml(displayUrl)}
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-go" data-url="${escapeAttr(link.url)}" data-id="${link.id}">
+                                ➡️ Перейти
+                            </button>
+                            <button class="btn-delete" data-id="${link.id}">
+                                🗑️ Удалить
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            linksContainer.innerHTML = cardsHtml;
+
+            // навешиваем обработчики на динамические кнопки после отрисовки
+            attachCardEvents();
+        }
+
+        // функция для экранирования XSS
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+                return c;
+            });
+        }
+
+        function escapeAttr(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // обработчики для карточек (переход, удаление)
+        function attachCardEvents() {
+            // все кнопки "Перейти"
+            document.querySelectorAll('.btn-go').forEach(btn => {
+                btn.removeEventListener('click', handleGoClick);
+                btn.addEventListener('click', handleGoClick);
+            });
+            // все кнопки "Удалить"
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.removeEventListener('click', handleDeleteClick);
+                btn.addEventListener('click', handleDeleteClick);
+            });
+        }
+
+        // обработчик перехода по ссылке
+        function handleGoClick(event) {
+            event.stopPropagation();
+            const btn = event.currentTarget;
+            let url = btn.getAttribute('data-url');
+            if (!url) {
+                showMessage('❌ Ошибка: ссылка не найдена', true);
+                return;
+            }
+            // открываем в новой вкладке с безопасными атрибутами
+            window.open(url, '_blank', 'noopener,noreferrer');
+            showMessage(`🚀 Переход: ${url.length > 40 ? url.substring(0, 40) + '…' : url}`, false);
+        }
+
+        // удаление ссылки с подтверждением
+        function handleDeleteClick(event) {
+            event.stopPropagation();
+            const btn = event.currentTarget;
+            const id = parseInt(btn.getAttribute('data-id'));
+            if (isNaN(id)) return;
+            
+            const linkToDelete = links.find(l => l.id === id);
+            if (!linkToDelete) return;
+            
+            if (confirm(`Удалить ссылку «${linkToDelete.title}»?`)) {
+                links = links.filter(link => link.id !== id);
+                saveLinksToLocal();
+                renderLinks();
+                showMessage(`🗑️ Ссылка "${linkToDelete.title}" удалена`, false);
+            }
+        }
+
+        // добавление новой ссылки из формы
+        function addLinkFromForm(titleRaw, urlRaw) {
+            let title = titleRaw.trim();
+            let rawUrl = urlRaw.trim();
+
+            if (title === '') {
+                showMessage('❌ Введите название ссылки', true);
+                return false;
+            }
+            if (rawUrl === '') {
+                showMessage('❌ Введите URL-адрес', true);
+                return false;
+            }
+
+            const validUrl = normalizeAndValidateUrl(rawUrl);
+            if (!validUrl) {
+                showMessage('❌ Некорректный URL. Убедитесь, что ссылка начинается с http:// или https://', true);
+                return false;
+            }
+
+            // проверка на дубликат (необязательно, но вежливо)
+            const existing = links.find(link => link.url === validUrl);
+            if (existing) {
+                showMessage(`⚠️ Ссылка "${existing.title}" уже существует в списке`, true);
+                return false;
+            }
+
+            const newLink = {
+                id: Date.now(),
+                title: title,
+                url: validUrl
+            };
+            links.push(newLink);
+            saveLinksToLocal();
+            renderLinks();
+
+            // очистка формы и фокус
+            titleInput.value = '';
+            urlInput.value = '';
+            titleInput.focus();
+            showMessage(`✅ "${title}" добавлена! Теперь можно перейти ✨`, false);
+            return true;
+        }
+
+        // основной обработчик отправки формы
+        function onSubmitForm(e) {
+            e.preventDefault();
+            addLinkFromForm(titleInput.value, urlInput.value);
+        }
+
+        // инициализация приложения
+        function init() {
+            loadLinksFromLocal();
+            renderLinks();
+            linkForm.addEventListener('submit', onSubmitForm);
+            // дополнительно добавим подсказку: если есть пустое поле - focus
+            titleInput.focus();
+        }
+
+        // запуск
+        init();
+    })();
+</script>
+</body>
+</html>
